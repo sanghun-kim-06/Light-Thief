@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin" />
+    <title>Light : Thief</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/opentype.js@latest/dist/opentype.min.js"></script>
+    <style>
+      @keyframes toLeft{
+        to{
+          opacity: 0;
+          transform: translateX(-30px);
+        }
+      }
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation-duration: 1s;
+      }
+
+      html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+      }
+        canvas {
+            display: block;
+            z-index: 10;
+        }
+        h2, h4{
+          margin: 0;
+          padding: 0;
+          width: 200px;
+          height: 0px;
+          z-index: 0;
+          position: absolute;
+          top: -50px;
+        }
+        main{
+          width: 100vw;
+          height: 100vh;
+          position: absolute;
+          top: 0;
+          left: 0;
+          z-index: 10;
+        }
+        div.etc{
+          margin: 0;
+          width: 450px;
+          height: 100vh;
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translate(-50%, 0);
+          /* background-color: #aaa; */
+        }
+        .detail{
+          display: flex;
+          justify-content: space-between;
+          margin: 0;
+          height: 90px;
+          /* background-color: #fff; */
+        }
+        .detail > p{
+          text-align: left;
+          font-size: 1.8rem;
+          color: aliceblue;
+        }
+        .down{
+          width: 450px;
+          height: 45vh;
+          position: inherit;
+          bottom: 0;
+          /* background-color: #fff; */
+        }
+        a{
+          text-decoration: none;
+          width: 100px;
+          height: 30px;
+          display: block;
+          text-align: center;
+          line-height: 28px;
+          border: 1px solid #fff;
+          border-radius: 20px;
+          color: #fff;
+        }
+        .down > .detail > p{
+          width: 450px;
+          height: 20px;
+          font-size: 1rem;
+        }
+
+        .slide-in {
+          animation: change 0.5s ease forwards;
+        }
+
+        @keyframes change {
+          from {
+            transform: translateX(100%);
+            visibility: visible;
+          }
+
+          to {
+            transform: translateX(0%);
+          }
+        }
+    </style>
+</head>
+<body oncontextmenu="return false" onselectstart="return false"> 
+  <h2>Light:Thief</h2>
+  <h4>도둑맞은 빛으로부터 상상을 되찾다</h4>
+  <main class="slide-in">
+    <div class="etc">
+      <div class="detail">
+        <p>Appilcation<br>Production</p><p>Class Club</p>
+      </div>
+      <div class="detail">
+        <p>Sanghun<br>kim</p><p>Solo<br>Exhibition</p>
+      </div>
+      
+      <div class="down">
+        <a href="balloon.html">Start ></a>
+        <div class="detail">
+        </div>
+      </div>
+    </div>
+    
+  </main>
+<script src="sketch.js"></script>
+</body>
+</html>

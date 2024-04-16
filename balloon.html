@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin" />
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+      @keyframes fromRight{
+        from{
+          opacity: 0;
+          transform: translateX(30px);
+        }
+      }
+
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation-duration: 1s;
+      }
+
+      html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+      }
+        canvas {
+            display: block;
+            z-index: 10;
+        }
+        h2, h4{
+          margin: 0;
+          padding: 0;
+          width: 200px;
+          height: 0px;
+          z-index: 0;
+          position: absolute;
+          top: -50px;
+        }
+        main{
+          width: 100vw;
+          height: 100vh;
+          position: absolute;
+          top: 0;
+          left: 0;
+          z-index: 10;
+        }
+        div.etc{
+          margin: 0;
+          width: 450px;
+          height: 100vh;
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translate(-50%, 0);
+          /* background-color: #aaa; */
+        }
+        .detail{
+          display: flex;
+          justify-content: space-between;
+          margin: 0;
+          height: 90px;
+          /* background-color: #fff; */
+        }
+        .detail > p{
+          text-align: left;
+          font-size: 1.8rem;
+          color: aliceblue;
+        }
+        .down{
+          width: 450px;
+          height: 45vh;
+          position: inherit;
+          bottom: 0;
+          display: flex;
+          /* background-color: #fff; */
+        }
+        a{
+          text-decoration: none;
+          width: 30px;
+          height: 30px;
+          display: block;
+          text-align: center;
+          line-height: 28px;
+          border: 1px solid #fff;
+          border-radius: 20px;
+          color: #fff;
+        }
+        .down > .detail > p{
+          width: 450px;
+          height: 20px;
+          font-size: 1rem;
+        }
+        #p5_loading{
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100vh;
+          color: white;
+          background-color: black;
+        }
+        @keyframes loading-ani {
+          from{transform: rotate(0deg);}
+          to{transform: rotate(360deg);}
+
+        }
+        #p5_loading:before{
+          content: 'loading...';
+          display: block;
+          width: 40px;
+          height: 40px;
+          border: 5px solid white;
+          animation: loading-ani 1s infinite;
+        }
+
+        .slide-in {
+          animation: change 0.5s ease forwards;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false" onselectstart="return false">
+  <div id="p5_loading"></div>
+  <main>
+  <div class="etc">
+    <div class="detail">
+      <p>THE FORGOTTEN<br/> A&nbsp;&nbsp;THEME</p><p>DREAM OF<br/>PARK</p>
+    </div>
+    <div class="detail">
+      <!-- <p></p><p/p> -->
+    </div>
+    
+    <div class="down">
+      <a href="index.html" style="margin-right: 15px;"> < </a>
+      <a href="keroro.html"> > </a>
+      <div class="detail">
+      </div>
+    </div>
+  </div>
+</main>
+    <script>
+var frag = `
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+uniform vec2 iResolution;
+uniform vec2 iMouse;
+uniform float iTime;
+uniform int noctaves;
+uniform float c[22];
+float mousefactor;
+
+float noise( in vec2 x )
+{
+	return sin(1.5*x.x)*sin(1.5*x.y);
+}
+
+const mat2 rot = mat2( 0.80,  0.6, -0.6,  0.8 );
+float fbm ( in vec2 _st) {
+    float v = 0.0;
+    float a = 0.6;
+    vec2 shift = 10.0*vec2(c[11],c[12]);
+    for (int i = 0; i < 12; ++i) {//noprotect
+		if(i>=noctaves)break;
+        v += a * noise(_st);
+        _st = rot*_st* 2.0 + shift;
+        a *= 0.5;
+    }
+    return v;
+}
+
+void main() {
+		vec2 mouse=iMouse/iResolution;
+    vec2 st =(-iResolution.xy+2.0*gl_FragCoord.xy)/iResolution.y;//(gl_FragCoord.xy/iResolution.xy);//
+    vec3 color = vec3(0.);
+    vec2 q = vec2(0.);
+    q.x = fbm( st+vec2(c[0],c[1]*.01*iTime) );
+    q.y = fbm( st+vec2(c[2],c[3]) );
+    vec2 r = vec2(0.);
+
+//play with the values here!
+		r.x = fbm( st+ (1.0*mouse.x+0.2)*q+vec2(c[5],c[6]));
+    r.y = fbm( st+ (1.0*mouse.y+0.5)*q*sin(.01*iTime)+vec2(c[8]*.05*iTime,c[9]));
+    float f = fbm(st+c[10]*(r+length(q) ));
+    color = smoothstep(vec3(0.1,0.1,0.6),vec3(0.1,0.1,0.1),color);
+    color = mix(color,vec3(1.856,.05*(1.0+cos(1.5+.2*iTime)),0.164706),r.y+length(q));//
+    color = mix(color,vec3(1.5*sin(.1*iTime),0.0,cos(.13*iTime)),length(r+q));//.2+.2*(1.0+cos(0.5+.3*iTime))
+		color = mix( color, vec3(0.9,0.9,0.9), dot(r,r) );
+		color*=(1.5*f*f*f+1.8*f*f+1.7*f);
+		color+=.4*vec3(1.8+r.x,0.7+q);
+		color=pow(color, vec3(.5));
+//
+
+    gl_FragColor = vec4(color,1.);
+}
+`;
+
+var vert = `
+#ifdef GL_ES
+      precision highp float;
+    #endif
+    #extension GL_OES_standard_derivatives : enable
+    // attributes, in
+    attribute vec3 aPosition;
+    attribute vec3 aNormal;
+    attribute vec2 aTexCoord;
+    attribute vec4 aVertexColor;
+
+    // attributes, out
+    varying vec3 var_vertPos;
+    varying vec4 var_vertCol;
+    varying vec3 var_vertNormal;
+    varying vec2 var_vertTexCoord;
+    
+    // matrices
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+    uniform mat3 uNormalMatrix;
+
+    void main() {
+      gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
+
+      // just passing things through
+      var_vertPos      = aPosition;
+      var_vertCol      = aVertexColor;
+      var_vertNormal   = aNormal;
+      var_vertTexCoord = aTexCoord;
+    }
+`;
+
+var gl, noctaves, c; // WebGL 컨텍스트, 옥타브 수, c 배열 선언
+let textureGraphics; // 그래픽스 객체
+
+function preload() {
+  // 여기서 모델을 미리 로드하십시오.
+  textureGraphics = loadModel('./source/globo/globo.obj');
+}
+
+
+function setup() {
+  createCanvas(windowWidth, windowHeight, WEBGL); // 웹글 컨텍스트를 이용해 캔버스 생성
+  gl = this._renderer.GL;
+  gl.disable(gl.DEPTH_TEST);
+
+  noctaves = 4; // 옥타브 수 초기화
+  c = []; // c 배열 초기화
+  initc(); // c 배열을 초기화하는 함수 호출
+
+  test = new p5.Shader(this._renderer, vert, frag); // p5.js 쉐이더 생성
+  shader(test); // 생성한 쉐이더를 현재 쉐이더로 설정
+}
+
+function initc() {
+  for (var i = 0; i < 22; i++) {
+    c[i] = random(-5, 5); // c 배열에 -5에서 5 사이의 랜덤 값을 채움
+  }
+}
+
+function draw() {
+
+
+    push();
+    noStroke();
+  test.setUniform("iResolution", [width, height]); // 쉐이더에 해상도 정보 전달
+  test.setUniform("iTime", millis() * 0.001); // 쉐이더에 시간 정보 전달
+  test.setUniform('iMouse', [mouseX, mouseY]); // 쉐이더에 마우스 위치 정보 전달
+  test.setUniform("noctaves", noctaves); // 쉐이더에 옥타브 수 정보 전달
+  test.setUniform("c", c); // 쉐이더에 c 배열 정보 전달
+  shader(test); // 쉐이더 적용
+
+  box(width * 1.3, height * 1.3); // 캔버스 중심에 크기가 width/2인 상자 그리기
+pop();
+
+resetShader();
+let y = -100;
+orbitControl(1, 1, 1, {disableTouchActions: true, freeRotation: true}); //how does it not reset - I should listen to?
+
+
+
+  // rotateZ(frameCount * 0.01);
+  rotateX(frameCount * 0.008);
+  scale(15);
+
+for(let x = -100; x < 100; x += 10){
+
+    
+    push();
+    translate(x, y);
+    fill(25, 0 ,10);
+    model(textureGraphics);
+    pop();
+    y += 10;
+}
+
+
+
+}
+
+function mouseReleased() {
+  noctaves = (noctaves == 5) ? 4 : noctaves + 1; // 클릭 시 옥타브 수 변경
+  if (noctaves == 4) initc(); // 옥타브 수가 4가 되면 c 배열 초기화
+}
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+    </script>
+</body>
+</html>
